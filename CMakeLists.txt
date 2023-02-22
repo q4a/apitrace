@@ -33,6 +33,8 @@ option (ENABLE_X11 "Enable X11 support." ON)
 
 option (ENABLE_EGL "Enable EGL support." ON)
 
+option (ENABLE_D3D9 "Enable D3D9 support in Linux." ON)
+
 option (ENABLE_WAFFLE "Enable WAFFLE support." OFF)
 
 option (ENABLE_SSE42 "Enable SSE 4.2 intrinsics." OFF)

@@ -478,3 +478,48 @@ if (ENABLE_EGL AND NOT WIN32 AND NOT APPLE)
 
     install (TARGETS egltrace LIBRARY DESTINATION ${WRAPPER_INSTALL_DIR})
 endif ()
+
+if (ENABLE_D3D9 AND NOT WIN32 AND NOT APPLE)
+    # d3dadapter9.so
+    add_custom_command (
+        OUTPUT egltrace.cpp
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/egltrace.py > ${CMAKE_CURRENT_BINARY_DIR}/egltrace.cpp
+        DEPENDS
+            egltrace.py
+            gltrace.py
+            trace.py
+            ${CMAKE_SOURCE_DIR}/dispatch/dispatch.py
+            ${CMAKE_SOURCE_DIR}/specs/eglapi.py
+            ${CMAKE_SOURCE_DIR}/specs/eglenum.py
+            ${CMAKE_SOURCE_DIR}/specs/glapi.py
+            ${CMAKE_SOURCE_DIR}/specs/glparams.py
+            ${CMAKE_SOURCE_DIR}/specs/gltypes.py
+            ${CMAKE_SOURCE_DIR}/specs/stdapi.py
+    )
+
+    add_library (egltrace SHARED
+        egltrace.cpp
+        dlsym.cpp
+        glproc_egl.cpp
+    )
+
+    add_dependencies (egltrace glproc)
+
+    set_target_properties (egltrace PROPERTIES
+        # avoid the default "lib" prefix
+        PREFIX ""
+    )
+
+    target_compile_definitions (egltrace PRIVATE -DEGLTRACE=1)
+
+    target_link_libraries (egltrace
+        gltrace_common
+        glproc
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${CMAKE_DL_LIBS}
+    )
+
+    target_linker_version_script (egltrace ${CMAKE_CURRENT_SOURCE_DIR}/egltrace.version)
+
+    install (TARGETS egltrace LIBRARY DESTINATION ${WRAPPER_INSTALL_DIR})
+endif ()
