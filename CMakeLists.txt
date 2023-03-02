@@ -49,6 +49,8 @@ option (BUILD_TESTING "Enable unit tests" ON)
 
 option (ENABLE_TESTS "Enable additional tests" OFF)
 
+option (ENABLE_DXVK "Enable DXVK to replay d3d9-d3d11 traces" OFF)
+
 if (ANDROID)
     message (FATAL_ERROR "Android is no longer supported (https://git.io/vH2gW)")
 endif ()

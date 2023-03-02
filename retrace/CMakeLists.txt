@@ -207,7 +207,40 @@ if (ENABLE_EGL AND ENABLE_WAFFLE)
     install (TARGETS eglretrace RUNTIME DESTINATION bin)
 endif ()
 
-if (WIN32)
+if (WIN32 OR ENABLE_DXVK)
+    if (ENABLE_DXVK)
+        add_definitions(-DENABLE_DXVK)
+        include(ExternalProject)
+        ExternalProject_Add(dxvk-native
+            GIT_REPOSITORY    https://github.com/q4a/dxvk-native
+            GIT_TAG           e6d339793721ceeb0db8848c6a6d62c22754fa33
+            GIT_SHALLOW       ON
+            BUILD_ALWAYS      OFF
+            CONFIGURE_HANDLED_BY_BUILD ON
+            CONFIGURE_COMMAND meson ../dxvk-native
+            BUILD_COMMAND     ninja
+            INSTALL_COMMAND   ""
+        )
+        ExternalProject_Get_property(dxvk-native SOURCE_DIR BINARY_DIR)
+        set(DXVK_NATIVE_INCLUDE_DIRS
+            "${SOURCE_DIR}/include/native/directx"
+            "${SOURCE_DIR}/include/native/windows"
+        )
+#        set(DXVK_NATIVE_D3D9_LIB ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
+        include_directories("${DXVK_NATIVE_INCLUDE_DIRS}")
+        ADD_CUSTOM_TARGET(dependencies ALL DEPENDS dxvk-native)
+
+        set (DirectX_D3D_INCLUDE_FOUND TRUE)
+        set (DirectX_D3D_INCLUDE_DIR ${SOURCE_DIR}/include/native/directx)
+        set (DirectX_D3D9_INCLUDE_FOUND TRUE)
+        set (DirectX_D3D9_INCLUDE_DIR ${SOURCE_DIR}/include/native/directx)
+
+        message("DirectX_D3D_INCLUDE_FOUND = ${DirectX_D3D_INCLUDE_FOUND}")
+        message("DirectX_D3D8_INCLUDE_FOUND = ${DirectX_D3D8_INCLUDE_FOUND}")
+        message("DirectX_D3D9_INCLUDE_FOUND = ${DirectX_D3D9_INCLUDE_FOUND}")
+        message("DirectX_D3D11_4_INCLUDE_FOUND = ${DirectX_D3D11_4_INCLUDE_FOUND}")
+    endif()
+
     if (DirectX_D3D_INCLUDE_FOUND)
         include_directories (BEFORE SYSTEM ${DirectX_D3D_INCLUDE_DIR})
         add_custom_command (
@@ -229,7 +262,7 @@ if (WIN32)
             d3d7state.cpp
             d3d7state_images.cpp
         )
-    else ()
+    elseif (!ENABLE_DXVK)
         message (FATAL_ERROR "d3d.h is required.")
     endif ()
 
