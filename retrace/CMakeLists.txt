@@ -212,8 +212,8 @@ if (WIN32 OR ENABLE_DXVK)
         add_definitions(-DENABLE_DXVK)
         include(ExternalProject)
         ExternalProject_Add(dxvk-native
-            GIT_REPOSITORY    https://github.com/q4a/dxvk-native
-            GIT_TAG           e6d339793721ceeb0db8848c6a6d62c22754fa33
+            GIT_REPOSITORY    https://github.com/q4a/dxvk
+            GIT_TAG           cafa2898aec7faa13c8ed629cbe222c7b375a41d
             GIT_SHALLOW       ON
             BUILD_ALWAYS      OFF
             CONFIGURE_HANDLED_BY_BUILD ON
@@ -262,7 +262,7 @@ if (WIN32 OR ENABLE_DXVK)
             d3d7state.cpp
             d3d7state_images.cpp
         )
-    elseif (!ENABLE_DXVK)
+    else ()
         message (FATAL_ERROR "d3d.h is required.")
     endif ()
 
