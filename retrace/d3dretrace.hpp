@@ -30,6 +30,9 @@
 
 #include "retrace.hpp"
 #include "d3dstate.hpp"
+#ifndef _WIN32
+#include "glproc.hpp"
+#endif
 
 
 namespace d3dretrace {
@@ -88,6 +91,7 @@ public:
 };
 
 
+#ifdef _WIN32
 HWND
 createWindow(int width, int height);
 
@@ -96,6 +100,13 @@ createWindow(HWND hWnd, int width, int height);
 
 void
 resizeWindow(HWND hWnd, int width, int height);
+#else
+Window
+createWindow(int width, int height);
+
+void
+resizeWindow(Window window, int width, int height);
+#endif
 
 bool
 processEvents(void);

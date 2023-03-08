@@ -230,7 +230,7 @@ if (WIN32 OR ENABLE_DXVK)
         include_directories("${DXVK_NATIVE_INCLUDE_DIRS}")
         ADD_CUSTOM_TARGET(dependencies ALL DEPENDS dxvk-native)
 
-        set (DirectX_D3D_INCLUDE_FOUND TRUE)
+        set (DirectX_D3D_INCLUDE_FOUND FALSE)
         set (DirectX_D3D_INCLUDE_DIR ${SOURCE_DIR}/include/native/directx)
         set (DirectX_D3D9_INCLUDE_FOUND TRUE)
         set (DirectX_D3D9_INCLUDE_DIR ${SOURCE_DIR}/include/native/directx)
@@ -241,8 +241,10 @@ if (WIN32 OR ENABLE_DXVK)
         message("DirectX_D3D11_4_INCLUDE_FOUND = ${DirectX_D3D11_4_INCLUDE_FOUND}")
     endif()
 
+    set(GEN_CPP "")
     if (DirectX_D3D_INCLUDE_FOUND)
         include_directories (BEFORE SYSTEM ${DirectX_D3D_INCLUDE_DIR})
+        set(GEN_CPP ${GEN_CPP} "d3dretrace_ddraw.cpp")
         add_custom_command (
             OUTPUT d3dretrace_ddraw.cpp
             COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/ddrawretrace.py > ${CMAKE_CURRENT_BINARY_DIR}/d3dretrace_ddraw.cpp
@@ -262,7 +264,7 @@ if (WIN32 OR ENABLE_DXVK)
             d3d7state.cpp
             d3d7state_images.cpp
         )
-    else ()
+    elseif (NOT ENABLE_DXVK)
         message (FATAL_ERROR "d3d.h is required.")
     endif ()
 
@@ -276,6 +278,7 @@ if (WIN32 OR ENABLE_DXVK)
     else ()
         set (HAVE_D3D8 0)
     endif ()
+    set(GEN_CPP ${GEN_CPP} "d3dretrace_d3d8.cpp")
     add_custom_command (
         OUTPUT d3dretrace_d3d8.cpp
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/d3d9retrace.py d3d8 ${HAVE_D3D8} > ${CMAKE_CURRENT_BINARY_DIR}/d3dretrace_d3d8.cpp
@@ -297,6 +300,7 @@ if (WIN32 OR ENABLE_DXVK)
     else ()
         set (HAVE_D3D9 0)
     endif ()
+    set(GEN_CPP ${GEN_CPP} "d3dretrace_d3d9.cpp")
     add_custom_command (
         OUTPUT d3dretrace_d3d9.cpp
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/d3d9retrace.py d3d9 ${HAVE_D3D9} > ${CMAKE_CURRENT_BINARY_DIR}/d3dretrace_d3d9.cpp
@@ -364,9 +368,7 @@ if (WIN32 OR ENABLE_DXVK)
 
     add_executable (d3dretrace
         d3dretrace_main.cpp
-        d3dretrace_ddraw.cpp
-        d3dretrace_d3d8.cpp
-        d3dretrace_d3d9.cpp
+        ${GEN_CPP}
         d3dretrace_dxgi_priv.cpp
         d3dretrace_ws.cpp
         d3d9state.cpp
@@ -374,10 +376,15 @@ if (WIN32 OR ENABLE_DXVK)
         d3d9state_images.cpp
         ${D3DSTATE_SOURCES}
     )
+    if (WIN32)
+        set(SYSTEM_DEPS
+            "d3dhelpers"
+            "ole32"
+        )
+    endif()
     target_link_libraries (d3dretrace
         retrace_common
-        d3dhelpers
-        ole32
+        ${SYSTEM_DEPS}
     )
     if (DirectX_D3D11_4_INCLUDE_FOUND)
         target_link_libraries (d3dretrace directxtex)

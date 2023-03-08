@@ -48,7 +48,9 @@ retrace::setUp(void) {
 void
 retrace::addCallbacks(retrace::Retracer &retracer)
 {
+#ifdef _WIN32
     retracer.addCallbacks(d3dretrace::ddraw_callbacks);
+#endif
     retracer.addCallbacks(d3dretrace::d3d8_callbacks);
     retracer.addCallbacks(d3dretrace::d3d9_callbacks);
 #ifdef HAVE_DXGI

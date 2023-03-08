@@ -28,12 +28,19 @@
 
 #include "d3dretrace.hpp"
 
+#ifdef _WIN32
 #include "ws_win32.hpp"
+#else
+#include "glproc.hpp"
+#include "glws.hpp"
+#include "glws_xlib.hpp"
+#endif
 
 
 namespace d3dretrace {
 
 
+#ifdef _WIN32
 HWND
 createWindow(int width, int height)
 {
@@ -67,19 +74,45 @@ createWindow(HWND hWnd, int width, int height)
     }
     return hWnd;
 }
+#else
+Window
+createWindow(int width, int height)
+{
+    //const GlxVisual *glxvisual = static_cast<const GlxVisual *>(glws::visual);
+    //XVisualInfo *visinfo = glxvisual->visinfo;
+    // FIXME: DXVK need to create Vulkan window
+    XVisualInfo *visinfo;
+    Window wnd = glws::createWindow(visinfo, "d3dretrace", width, height);
+    glws::showWindow(wnd);
+
+    return wnd;
+}
+#endif
 
 
+#ifdef _WIN32
 void
 resizeWindow(HWND hWnd, int width, int height)
 {
     ws::resizeWindow(hWnd, width, height);
 }
+#else
+void
+resizeWindow(Window window, int width, int height)
+{
+    glws::resizeWindow(window, width, height);
+}
+#endif
 
 
 bool
 processEvents(void)
 {
+#ifdef _WIN32
     return ws::processEvents();
+#else
+    return glws::processEvents();
+#endif
 }
 
 
