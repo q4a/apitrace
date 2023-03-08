@@ -464,9 +464,9 @@ dumpTextures(StateWriter &writer, IDirect3DDevice9 *pDevice)
                 if (image) {
                     char label[128];
                     if (Type == D3DRTYPE_CUBETEXTURE) {
-                        _snprintf(label, sizeof label, "PS_RESOURCE_%lu_FACE_%lu_LEVEL_%lu", Stage, Face, Level);
+                        snprintf(label, sizeof label, "PS_RESOURCE_%lu_FACE_%lu_LEVEL_%lu", Stage, Face, Level);
                     } else {
-                        _snprintf(label, sizeof label, "PS_RESOURCE_%lu_LEVEL_%lu", Stage, Level);
+                        snprintf(label, sizeof label, "PS_RESOURCE_%lu_LEVEL_%lu", Stage, Level);
                     }
                     writer.beginMember(label);
                     writer.writeImage(image, imageDesc);
@@ -506,7 +506,7 @@ dumpRenderTargets(StateWriter &writer,
         image = getRenderTargetImage(pDevice, pRenderTarget, imageDesc);
         if (image) {
             char label[64];
-            _snprintf(label, sizeof label, "RENDER_TARGET_%u", i);
+            snprintf(label, sizeof label, "RENDER_TARGET_%u", i);
             writer.beginMember(label);
             writer.writeImage(image, imageDesc);
             writer.endMember(); // RENDER_TARGET_*

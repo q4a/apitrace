@@ -138,7 +138,7 @@ formatToString(D3DFORMAT fmt)
             buf[10] = ch3;
             // buf[11] always '\0';
         } else {
-            _snprintf(buf, sizeof buf, "%u", fmt);
+            snprintf(buf, sizeof buf, "%u", fmt);
         }
         return buf;
     }

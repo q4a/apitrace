@@ -83,6 +83,11 @@ failed(trace::Call &call, HRESULT hr)
 
     os << "\n";
 }
+#else
+void
+failed(trace::Call &call, HRESULT hr)
+{
+}
 #endif /* _WIN32 */
 
 

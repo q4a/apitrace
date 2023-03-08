@@ -34,7 +34,7 @@
 #include <map>
 #include <ostream>
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(ENABLE_DXVK)
 #include <windows.h>
 #endif
 
@@ -205,7 +205,7 @@ extern trace::DumpFlags dumpFlags;
 
 std::ostream &warning(trace::Call &call);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(ENABLE_DXVK)
 void failed(trace::Call &call, HRESULT hr);
 #endif
 
